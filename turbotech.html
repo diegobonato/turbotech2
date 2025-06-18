@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurboTech - Rigenerazione turbocompressori</title>
+    <style>
+        /* --- Google Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap');
+
+        /* --- CSS Variables --- */
+        :root {
+            --primary-color: #0065b3;
+            --dark-color: #2d3436;
+            --light-color: #f0f2f5;
+            --secondary-dark: #3c4a5c;
+            --text-color: #333;
+            --white-color: #FFFFFF;
+            --accent-orange: #f39c12;
+            --font-main: 'Montserrat', sans-serif;
+            --font-secondary: 'Roboto', sans-serif;
+        }
+
+        /* --- General Styles & Resets --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 2rem;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-main);
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--dark-color);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        
+        section {
+            padding: 5rem 0;
+        }
+        
+        /* --- Header & Navigation --- */
+        .main-header {
+            background-color: var(--white-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        .main-nav ul li {
+            margin-left: 2rem;
+        }
+
+        .main-nav ul li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 600;
+            font-family: var(--font-main);
+            transition: color 0.3s ease;
+        }
+        
+        .main-nav ul li a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* --- Hero Section & Slideshow --- */
+        .hero {
+            position: relative;
+            height: 85vh;
+            color: var(--white-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        .slideshow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 52, 54, 0.7);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--white-color);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            font-family: var(--font-secondary);
+        }
+
+        /* --- Products Carousel Section --- */
+        #products {
+            background-color: var(--light-color);
+        }
+
+        .carousel-container {
+            position: relative;
+            background: var(--white-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .carousel-viewport {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .product-slide {
+            flex: 0 0 33.333%; /* Show 3 slides on desktop */
+            padding: 0 1rem;
+            text-align: center;
+        }
+
+        .product-slide img {
+            max-width: 100%;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+
+        .product-slide h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            min-height: 40px;
+        }
+        
+        .product-slide p {
+            font-size: 0.9rem;
+            color: #666;
+            min-height: 60px;
+        }
+        
+        .product-slide .pronta-consegna {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+        
+        .carousel-button:hover {
+            background-color: var(--white-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .carousel-button.prev {
+            left: -22px;
+        }
+        
+        .carousel-button.next {
+            right: -22px;
+        }
+
+        .carousel-nav {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .carousel-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #ccc;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background-color: var(--primary-color);
+        }
+        
+        .product-cta {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            border-top: 1px solid #ddd;
+        }
+        
+        .product-cta h3 {
+            color: var(--accent-orange);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-cta p {
+            color: #555;
+            font-size: 1rem;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* --- Mission Section (CSS RESTORED) --- */
+        .mission {
+            background-color: var(--secondary-dark);
+            color: var(--white-color);
+        }
+        
+        .mission-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .mission-image {
+            flex: 1;
+        }
+        
+        .mission-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .mission-text {
+            flex: 1;
+        }
+
+        .mission-text .quote {
+            font-size: 1.8rem;
+            font-family: var(--font-main);
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1.5rem;
+            color: var(--white-color); /* Ensure quote text is white */
+        }
+        
+        .mission-text .author {
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #ccc; /* Lighter color for the author */
+        }
+        
+        .mission-text .btn {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+        }
+
+        .mission-text .btn:hover {
+            background-color: #004c8c;
+        }
+        
+        /* --- Footer --- */
+        .main-footer {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            padding: 4rem 0;
+        }
+
+        .contact-banner {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 2rem 0;
+        }
+
+        .contact-banner .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .contact-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-item h4 {
+            margin-bottom: 0.5rem;
+            font-family: var(--font-main);
+            font-size: 1.2rem;
+        }
+
+        .contact-item p, .contact-item a {
+            font-family: var(--font-secondary);
+            font-size: 1rem;
+            color: var(--white-color);
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* --- Responsive Design --- */
+        @media(max-width: 992px) {
+            .product-slide {
+                flex: 0 0 50%; /* Show 2 slides on tablets */
+            }
+        }
+        
+        @media(max-width: 768px) {
+            h2 { font-size: 2rem; }
+            section { padding: 3rem 0; }
+            
+            .main-header .container { 
+                flex-direction: column; 
+                gap: 1rem;
+            }
+            .logo img { max-height: 60px; }
+            
+            .hero { height: 70vh; }
+            .hero-content h1 { font-size: 2.5rem; }
+            
+            .product-slide {
+                flex: 0 0 100%; /* Show 1 slide on mobile */
+            }
+
+            .mission-content {
+                flex-direction: column; /* Stack image and text on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="#" class="logo">
+                <img src="./logo.png" alt="TurboTech Logo">
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#products">Prodotti</a></li>
+                    <li><a href="#mission">Chi Siamo</a></li>
+                    <li><a href="#contact">Contatti</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="slideshow-container">
+                <div class="slide active" style="background-image: url('./banner_009.jpg');"></div>
+                <div class="slide" style="background-image: url('./banner_011.jpg');"></div>
+                <div class="slide" style="background-image: url('./banner_013.jpg');"></div>
+                <div class="slide" style="background-image: url('./banner_014.jpg');"></div>
+                <div class="slide" style="background-image: url('./banner_015.jpg');"></div>
+            </div>
+            <div class="hero-content">
+                <h1>Potenza Rigenerata, Prestazioni Garantite</h1>
+                <p>La tua fonte di fiducia per turbocompressori rigenerati ad alta precisione.</p>
+                <a href="#products" class="btn btn-outline">Scopri i Nostri Turbo</a>
+            </div>
+        </section>
+
+        <!-- Products Carousel Section -->
+        <section id="products">
+            <div class="container">
+                <h2>Le Nostre Turbine</h2>
+                <div class="carousel-container">
+                    <button class="carousel-button prev">❮</button>
+                    <div class="carousel-viewport">
+                        <div class="carousel-track">
+                            <div class="product-slide">
+                                <img src="./turbina1.jpg" alt="Turbina per Volkswagen Golf">
+                                <h3>Turbocompressore Revisionato KKK 5439-970-0022</h3>
+                                <p>per Volkswagen Golf 1.9 TDI 105 CV</p>
+                                <p class="pronta-consegna">Pronta Consegna</p>
+                            </div>
+                            <div class="product-slide">
+                                <img src="./turbina2.jpg" alt="Turbina per Opel Astra">
+                                <h3>Turbocompressore Revisionato MHI 49131-06003</h3>
+                                <p>per Opel Astra 1.7 Cdti 100 CV</p>
+                                <p class="pronta-consegna">Pronta Consegna</p>
+                            </div>
+                            <div class="product-slide">
+                                <img src="./turbina2.jpg" alt="Turbina per BMW">
+                                <h3>Turbocompressore Revisionato MHI 49135-05671</h3>
+                                <p>per BMW 3.20d 163 CV</p>
+                                <p class="pronta-consegna">Pronta Consegna</p>
+                            </div>
+                            <div class="product-slide">
+                               <img src="./turbina1.jpg" alt="Turbina per Volkswagen Golf">
+                               <h3>Turbocompressore Garrett GT1749V</h3>
+                               <p>per Audi A3 / Seat Leon 1.9 TDI 110 CV</p>
+                               <p class="pronta-consegna">Pronta Consegna</p>
+                           </div>
+                           <div class="product-slide">
+                               <img src="./turbina2.jpg" alt="Turbina per Opel Astra">
+                               <h3>Turbocompressore Revisionato IHI VL36</h3>
+                               <p>per Fiat Grande Punto / Alfa Mito 1.4 T-Jet</p>
+                               <p class="pronta-consegna">Pronta Consegna</p>
+                           </div>
+                        </div>
+                    </div>
+                    <button class="carousel-button next">❯</button>
+                </div>
+                <div class="carousel-nav"></div>
+                <div class="product-cta">
+                    <h3>NON HAI TROVATO IL TUO MODELLO DI AUTO?</h3>
+                    <p>QUESTI SONO ALCUNI ESEMPI DI TURBINE. SIAMO IN GRADO DI FORNIRE TUTTE LE TURBINE PRESENTI NEL MERCATO. INVIACI IL CODICE DELLA TUA: CHIAMACI O INVIA UNA MAIL. T. 0444 1234567 - INFO@TURBOTECH.IT</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mission Section -->
+        <section class="mission" id="mission">
+            <div class="container">
+                <div class="mission-content">
+                    <div class="mission-image">
+                        <img src="./diego-bonato.jpeg" alt="Il fondatore di TurboTech">
+                    </div>
+                    <div class="mission-text">
+                        <p class="quote">"Siamo in grado di rigenerare tutte le turbine in commercio. Lo facciamo con l’esperienza e la professionalità che ci contraddistinguono da chi lavora con tecniche poco professionali e macchinari improvvisati."</p>
+                        <p class="author">Fabio Rossetto, Fondatore di TurboTech</p>
+                        <a href="#contact" class="btn">La Nostra Missione</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    
+
+    <!-- JAVASCRIPTS -->
+    <script>
+        // HERO SLIDESHOW
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroSlides = document.querySelectorAll('.slide');
+            let currentHeroSlide = 0;
+            if (heroSlides.length > 0) {
+                setInterval(() => {
+                    heroSlides[currentHeroSlide].classList.remove('active');
+                    currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
+                    heroSlides[currentHeroSlide].classList.add('active');
+                }, 5000);
+            }
+        });
+
+        // PRODUCT CAROUSEL
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.carousel-container');
+            if (!container) return;
+
+            const track = container.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextButton = container.querySelector('.carousel-button.next');
+            const prevButton = container.querySelector('.carousel-button.prev');
+            const dotsNav = container.querySelector('.carousel-nav');
+            
+            // On small screens, we might have 1, 2, or 3 slides visible.
+            // Let's determine how many slides are visible to calculate the number of "pages".
+            const slidesPerView = () => {
+                if (window.innerWidth <= 768) return 1;
+                if (window.innerWidth <= 992) return 2;
+                return 3;
+            };
+            
+            let numPages = Math.ceil(slides.length / slidesPerView());
+            let currentPage = 0;
+            
+            function setupCarousel() {
+                numPages = Math.ceil(slides.length / slidesPerView());
+                dotsNav.innerHTML = ''; // Clear existing dots
+                for (let i = 0; i < numPages; i++) {
+                    const dot = document.createElement('button');
+                    dot.classList.add('carousel-dot');
+                    if (i === 0) dot.classList.add('active');
+                    dotsNav.appendChild(dot);
+                    dot.addEventListener('click', () => {
+                        currentPage = i;
+                        moveToPage(currentPage);
+                    });
+                }
+                 moveToPage(0); // Reset to first page
+            }
+            
+            const dots = Array.from(dotsNav.children);
+
+            const moveToPage = (pageIndex) => {
+                const spv = slidesPerView();
+                const slideIndex = pageIndex * spv;
+                // Clamp index to prevent going out of bounds
+                const targetIndex = Math.min(slideIndex, slides.length - spv);
+                
+                track.style.transform = 'translateX(-' + slides[targetIndex].offsetLeft + 'px)';
+                
+                // Update dots
+                const activeDot = dotsNav.querySelector('.active');
+                if (activeDot) activeDot.classList.remove('active');
+                dotsNav.children[pageIndex].classList.add('active');
+            };
+
+            prevButton.addEventListener('click', () => {
+                currentPage = currentPage - 1;
+                if (currentPage < 0) {
+                    currentPage = numPages - 1;
+                }
+                moveToPage(currentPage);
+            });
+
+            nextButton.addEventListener('click', () => {
+                currentPage = currentPage + 1;
+                if (currentPage >= numPages) {
+                    currentPage = 0;
+                }
+                moveToPage(currentPage);
+            });
+
+            // Re-calculate on window resize
+            window.addEventListener('resize', setupCarousel);
+            
+            // Initial setup
+            setupCarousel();
+        });
+    </script>
+
+    <footer class="contact-footer">
+        <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+            <img src="./logo.png" alt="TurboTech Logo">
+            </div>
+            <div class="footer-info">
+            <h3>Contattaci</h3>
+            <p><strong>Indirizzo:</strong> Via dell’Industria 12, 36100 Vicenza (VI)</p>
+            <p><strong>Email:</strong> <a href="mailto:info@turbotech.it">info@turbotech.it</a></p>
+            <p><strong>Telefono:</strong> <a href="tel:+390444123456">+39 0444 123456</a></p>
+            <p><strong>Orari:</strong> Lun-Ven 8:00 - 18:00</p>
+            </div>
+        </div>
+        </div>
+    </footer>
+  
+
+</body>
+</html>
