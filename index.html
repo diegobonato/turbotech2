@@ -522,14 +522,15 @@
     </main>
 
     
-
-    <!-- JAVASCRIPTS -->
+    <!-- JAVASCRIPTS (CORRECTED) -->
     <script>
-        // HERO SLIDESHOW
+        // HERO SLIDESHOW (No changes needed here)
         document.addEventListener('DOMContentLoaded', function() {
             const heroSlides = document.querySelectorAll('.slide');
             let currentHeroSlide = 0;
             if (heroSlides.length > 0) {
+                // Make sure the first slide is active initially
+                heroSlides[currentHeroSlide].classList.add('active');
                 setInterval(() => {
                     heroSlides[currentHeroSlide].classList.remove('active');
                     currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
@@ -538,7 +539,7 @@
             }
         });
 
-        // PRODUCT CAROUSEL
+        // PRODUCT CAROUSEL (FIXED LOGIC)
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.querySelector('.carousel-container');
             if (!container) return;
@@ -547,70 +548,87 @@
             const slides = Array.from(track.children);
             const nextButton = container.querySelector('.carousel-button.next');
             const prevButton = container.querySelector('.carousel-button.prev');
-            const dotsNav = container.querySelector('.carousel-nav');
-            
-            // On small screens, we might have 1, 2, or 3 slides visible.
-            // Let's determine how many slides are visible to calculate the number of "pages".
-            const slidesPerView = () => {
-                if (window.innerWidth <= 768) return 1;
-                if (window.innerWidth <= 992) return 2;
-                return 3;
+            const dotsNav = document.querySelector('.carousel-nav'); // Corrected selector
+
+            if (!track || slides.length === 0 || !nextButton || !prevButton || !dotsNav) {
+                console.error('Carousel elements not found!');
+                return;
+            }
+
+            let currentPage = 0;
+            let slidesPerView = 3;
+            let numPages = 0;
+
+            const updateCarouselDimensions = () => {
+                // Determine how many slides are visible based on screen width
+                if (window.innerWidth <= 768) {
+                    slidesPerView = 1;
+                } else if (window.innerWidth <= 992) {
+                    slidesPerView = 2;
+                } else {
+                    slidesPerView = 3;
+                }
+                numPages = Math.ceil(slides.length / slidesPerView);
+            };
+
+            const moveToPage = (pageIndex) => {
+                // **THE FIX IS HERE:** We calculate distance based on slide width, not offsetLeft.
+                const slideWidth = slides[0].getBoundingClientRect().width;
+                const distance = pageIndex * slidesPerView * slideWidth;
+
+                // This ensures we don't scroll past the last items
+                const maxDistance = (slides.length - slidesPerView) * slideWidth;
+                const finalDistance = Math.min(distance, maxDistance < 0 ? 0 : maxDistance);
+
+                track.style.transform = `translateX(-${finalDistance}px)`;
+
+                // Update dots
+                const dots = Array.from(dotsNav.children);
+                dots.forEach(dot => dot.classList.remove('active'));
+                if (dots[pageIndex]) {
+                    dots[pageIndex].classList.add('active');
+                }
             };
             
-            let numPages = Math.ceil(slides.length / slidesPerView());
-            let currentPage = 0;
-            
-            function setupCarousel() {
-                numPages = Math.ceil(slides.length / slidesPerView());
+            const setupCarousel = () => {
+                updateCarouselDimensions();
                 dotsNav.innerHTML = ''; // Clear existing dots
+                
                 for (let i = 0; i < numPages; i++) {
                     const dot = document.createElement('button');
                     dot.classList.add('carousel-dot');
                     if (i === 0) dot.classList.add('active');
-                    dotsNav.appendChild(dot);
                     dot.addEventListener('click', () => {
                         currentPage = i;
                         moveToPage(currentPage);
                     });
+                    dotsNav.appendChild(dot);
                 }
-                 moveToPage(0); // Reset to first page
-            }
-            
-            const dots = Array.from(dotsNav.children);
-
-            const moveToPage = (pageIndex) => {
-                const spv = slidesPerView();
-                const slideIndex = pageIndex * spv;
-                // Clamp index to prevent going out of bounds
-                const targetIndex = Math.min(slideIndex, slides.length - spv);
                 
-                track.style.transform = 'translateX(-' + slides[targetIndex].offsetLeft + 'px)';
-                
-                // Update dots
-                const activeDot = dotsNav.querySelector('.active');
-                if (activeDot) activeDot.classList.remove('active');
-                dotsNav.children[pageIndex].classList.add('active');
+                // Go to the first page, resetting position
+                currentPage = 0; 
+                moveToPage(currentPage);
             };
 
-            prevButton.addEventListener('click', () => {
-                currentPage = currentPage - 1;
-                if (currentPage < 0) {
-                    currentPage = numPages - 1;
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                if (currentPage >= numPages) {
+                    currentPage = 0; // Loop to the beginning
                 }
                 moveToPage(currentPage);
             });
 
-            nextButton.addEventListener('click', () => {
-                currentPage = currentPage + 1;
-                if (currentPage >= numPages) {
-                    currentPage = 0;
+            prevButton.addEventListener('click', () => {
+                currentPage--;
+                if (currentPage < 0) {
+                    currentPage = numPages - 1; // Loop to the end
                 }
                 moveToPage(currentPage);
             });
 
             // Re-calculate on window resize
             window.addEventListener('resize', setupCarousel);
-            
+
             // Initial setup
             setupCarousel();
         });
